@@ -93,7 +93,7 @@ function RateModal({ onSubmit }) {
   };
 
   const handleSelection = (emojiPath, i) => {
-    { setRate(i + 1); setMyEmoji(emojiPath); setSelectedEmoji(true) }; // on conditionne la sauvegarde de la valeur à un vote et on empêche ainsi tout rate = 0
+    setRate(i + 1); setMyEmoji(emojiPath); setSelectedEmoji(true); // on conditionne la sauvegarde de la valeur à un vote et on empêche ainsi tout rate = 0
   };
   const personalEmoji = [];
   for (let i = 0; i < 5; i++) {

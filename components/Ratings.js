@@ -32,7 +32,8 @@ function Ratings() {
     //Affiche la liste des ratings
     const ratings = useSelector((state) => state.rating.value);
     console.log("RATINGS", ratings);
-    //Necessaire piyr trouver le rating par user
+
+    //Necessaire pour trouver le rating par user
     const user = useSelector((state) => state.user.value);
     console.log("USER ", user);
 
@@ -112,24 +113,9 @@ function Ratings() {
                         <p className={styles.gameNameCard}>{game.gameDetails.name}</p>
                     </div> */}
                     <div className={styles.ratingInfo}>
-                        <span className={styles.info}>Rating: <Image src={ratingEmoji} alt={`Rating: ${data.rating}`} width={24} height={24} /></span>
-                        <span className={styles.info}>Comment: {data.comment}</span>
-                        <span className={styles.info}>Rating added on: {ratingDate}</span>
-                    </div>
-                    <div className={styles.buttonContainer}>
-                        <button
-                            className={styles.iconButton}
-                            onClick={(event) => handleDelete(event, data.game)}
-                        >
-                            {" "}
-                            <Image
-                                src="/icons/trash.svg"
-                                alt="Remove from wishlist"
-                                width={24}
-                                height={24}
-                                className={styles.likeIcon}
-                            />
-                        </button>
+                        <span className={styles.infoWithIcon}><b>Rating:</b> <Image src={ratingEmoji} alt={`Rating: ${data.rating}`} width={24} height={24} /></span>
+                        <span className={styles.info}><b>Comment:</b> {data.comment}</span>
+                        <span className={styles.info}><b>Rating added on:</b> {ratingDate}</span>
                     </div>
                 </div>
             );
