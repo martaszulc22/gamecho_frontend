@@ -62,7 +62,7 @@ function Ratings() {
 
 
     const handleDelete = (rating, event) => {
-        fetch(`http://localhost:3000/ratings/${user.token}/${game.name}`, {
+        fetch(`http://localhost:3000/ratings/${user.token}/${rating.name}`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
         })
@@ -97,7 +97,7 @@ function Ratings() {
                             key={data.game.name}
                             game={data.game}
                             isAddedToWishlist={isAddedToWishlist(data.game)}
-                            onHeartClick={(event) => handleDelete(event, data.game)}
+                            onHeartClick={() => handleDelete(data.game)}
                             onClick={() => handleGameCardClick(data.game)}
                             iconType="trash"
                         />
