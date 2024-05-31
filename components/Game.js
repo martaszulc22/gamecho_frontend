@@ -15,7 +15,7 @@ const ratingToEmoji = {
   3: "/icons/emojiIcons/neutral.svg",
   4: "/icons/emojiIcons/happy.svg",
   5: "/icons/emojiIcons/love.svg",
-}; +9
+};
 
 function Game() {
   const modalVisible = useSelector((state) => state.config.value.modalOpen);
@@ -24,42 +24,49 @@ function Game() {
   const isLightmode = useSelector((state) => state.config.value.mode); // pour Paul
   const dispatch = useDispatch();
 
-  const [modalSubmitted, setModalSubmitted] = useState(0);
-
   const [ratingScale, setRatingScale] = useState(5); // échelle du vote, avec les émojis, par défaut sauvegardé dans un état qu'on mettra à jour selon le ratingMode
 
   console.log("DETAILS", gameDetails); // pour connaître la structure de la réponse (normalement identifique à la BDD)
   const [ratingsList, setRatingsList] = useState([]);
   const ratings = useSelector((state) => state.rating.value); // pour recuperer la valeur de notre
 
-  const fetchRatings = () => {
+  useEffect(() => {
+    //on construit une chaîne de requête en utilisant le nom du jeu à partir de gameDetails
     const query = `name=${gameDetails.name}`;
-
     fetch(`http://localhost:3000/games/ratings?${query}`)
       .then((response) => response.json())
       .then((data) => {
         console.log("useEffect data", data);
-
+        dispatch(loadRates(data))
         setRatingsList(data.data);
-        dispatch(loadRates(data.data));
         console.log("fetch", data.data);
+
+        // on vérifie la présence d'une clé "ratingMode", qui détermine l'échelle du vote, dans le premier tableau du document
 
         let ratingMode;
         if (data && data.data && data.data[0]) {
-          ratingMode = data.data[0].ratingMode;
+          // IMPORTANT on doit vérifier étape par étape la présence du tableau
+
+          // Pourquoi ne pas juste faire juste if (data.data[0]) ? Parce qu'essayer d'accéder à un tableau à partir de données qui n'existent peut-etre pas car ON ACCEDE PAS A UNE CLE D'UNDEFINED
+
+          // avec les conditions chainées, "data && data.data && data.data[0]", si dès le data c'est undefined, le code n'execute pas la condition et continue !
+
+          // si on trouve le premier tableau retourné par la route
+          ratingMode = data.data[0].ratingMode; // on cible la clé "ratingMode" pour s'assurer d'avoir les bonnes valeurs et les convertir en aval et on sauvegarde la valeur de la clé dans une constante
         }
+
+        // pour que la valeur du vote soit correctement traitée, on doit définir son échelle
+        // soit s'assurer que le nom d'une clé corresponde à l'échelle associée
 
         if (ratingMode === "Out of 100") {
           setRatingScale(100);
         } else if (ratingMode === "Out of 10") {
+          // si le ratingMode du vote est sur 10, on modifie l'échelle
           setRatingScale(10);
         }
       });
-  };
-
-  useEffect(() => {
-    fetchRatings();
-  }, [gameDetails.name]);
+  }, []);
+  // }, [ratingsList]);
 
   let totalRatings = 0; // on initialise à 0 les deux paramètres nécessaires au calcul de la moyenne EN DEHORS de la boucle pour les exploiter
   let ratingsLength = 0;
@@ -132,10 +139,12 @@ function Game() {
                 // ICI on dynamise la source de l'icône utilisée pour illustrer le vote
                 // Il est nécessaire de se servir de l'échelle, enregistrée dans l'état, et de la diviser par 5 pour qu'elle puisse être associée à un chiffre de 1 à 5 et ce peu importe le ratingMode
                 // Le Math.floor est essentiel pour arrondir le resultat et obtenir un nombre entier et exploitable
+
                 src={emojiRate}
                 alt={`Rating: ${vote.rating}`}
                 width={24}
                 height={24}
+                className={styles.iconMargin}
               />
 
             </span>
@@ -145,6 +154,9 @@ function Game() {
       );
     })
     : null;
+
+
+
 
   //WISHLIST HEART ICON CLICK
   //la fonction prend un seul paramètre : game. Cet objet représente le jeu sur lequel l'utilisateur a cliqué pour l'ajouter ou le retirer de la wishlist.
@@ -161,6 +173,12 @@ function Game() {
     }
   };
 
+
+  const handleHeartIconClick = (event, game) => {
+    event.stopPropagation();
+    // cela empêche l'événement de clic de "handleWishlistClick" de se propager à l'événement de clic "handleGameCardClick" de la div parente. Cela signifie que l'on peut cliquer sur le cœur et que cela ne déclenchera pas la navigation vers la page du jeu. Cela ajoutera simplement le jeu à la liste de souhaits.
+    handleWishlistClick(game);
+  };
   // la constante ne s'execute que s'il y a au moins un vote => on divise le total des valeurs obtenueslors du map par le nombre de votes / sinon, la moyenne n'existe pas (0)
 
   const averageRating = ratingsLength > 0 ? totalRatings / ratingsLength : 0;
@@ -208,8 +226,7 @@ function Game() {
           }}
         >
           <div className={styles.topBannerContainer}>
-            <button className={styles.iconButton}
-              onHeartClick={() => handleWishlistClick(gameDetails)}>
+            <button className={styles.iconButton} onHeartClick={(event) => handleHeartIconClick(event, gameDetails)}>
               {" "}
               <Image
 
@@ -238,7 +255,7 @@ function Game() {
 
 
           {/* Permet d'éviter une erreur si l'image n'est pas récupérée au moment de l'execution */}
-          {gameDetails.imageGame && (<div className={isLightmode ? styles.bottomBannerContainerLight : styles.bottomBannerContainer}>
+          {gameDetails.imageGame && (<div className={styles.bottomBannerContainer}>
             <h2 className={styles.sectionTitle}>{gameDetails.name}</h2>
             <div className={styles.captionGameName}>
               {emojiAverage ? (
@@ -252,7 +269,6 @@ function Game() {
                       alt="Rating icon"
                       width={24}
                       height={24}
-                      className={isLightmode ? styles.emojiLight : ''}
                     />
 
                   </div>
@@ -272,18 +288,18 @@ function Game() {
             </div>
           </div>)}
         </div>
-        <div className={isLightmode ? styles.bottomContainerLight : styles.bottomContainer}>
+        <div className={styles.bottomContainer}>
           <div className={styles.tagContainer}>
 
             {/* Si la clé du jeu n'est pas renseignée, on affiche pas le tag correspondant */}
-            {gameDetails.developer && (<div className={styles.tag01} style={isLightmode ? { color: "#FFF9E8" } : ''}>{gameDetails.developer}</div>)}
-            {gameDetails.platforms && (<div className={styles.tag02} style={isLightmode ? { color: "#FFF9E8" } : ''}>{gameDetails.platforms}</div>)}
-            {gameDetails.publisher && (<div className={styles.tag03} style={isLightmode ? { color: "#FFF9E8" } : ''}>{gameDetails.publisher}</div>)}
-            {gameDetails.releasedDate && (<div className={styles.tag04} style={isLightmode ? { color: "#FFF9E8" } : ''}>{gameDetails.releasedDate}</div>)}
-            {gameDetails.genre && (<div className={styles.tag05} style={isLightmode ? { color: "#FFF9E8" } : ''}>{gameDetails.genre}</div>)}
+            {gameDetails.developer && (<div className={styles.tag01}>{gameDetails.developer}</div>)}
+            {gameDetails.platforms && (<div className={styles.tag02}>{gameDetails.platforms}</div>)}
+            {gameDetails.publisher && (<div className={styles.tag03}>{gameDetails.publisher}</div>)}
+            {gameDetails.releasedDate && (<div className={styles.tag04}>{gameDetails.releasedDate}</div>)}
+            {gameDetails.genre && (<div className={styles.tag05}>{gameDetails.genre}</div>)}
           </div>
 
-          <div className={isLightmode ? styles.descriptionContainerLight : styles.descriptionContainer}>
+          <div className={styles.descriptionContainer}>
             <h3>Summary</h3>
             <div
               dangerouslySetInnerHTML={{ __html: gameDetails.description }}
@@ -312,7 +328,7 @@ function Game() {
         open={modalVisible}
         footer={null}
       >
-        <RateModal onSubmit={fetchRatings} />
+        <RateModal />
       </Modal>
     </div>
   );
