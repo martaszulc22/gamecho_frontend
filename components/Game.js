@@ -30,43 +30,34 @@ function Game() {
   const [ratingsList, setRatingsList] = useState([]);
   const ratings = useSelector((state) => state.rating.value); // pour recuperer la valeur de notre
 
-  useEffect(() => {
-    //on construit une chaîne de requête en utilisant le nom du jeu à partir de gameDetails
-    const query = `name=${gameDetails.name}`;
+  const fetchRatings = () => {
+    const query = `name=${gameDetails.name}`
+
     fetch(`http://localhost:3000/games/ratings?${query}`)
       .then((response) => response.json())
       .then((data) => {
         console.log("useEffect data", data);
-        dispatch(loadRates(data))
-        setRatingsList(data.data);
-        console.log("fetch", data.data);
 
-        // on vérifie la présence d'une clé "ratingMode", qui détermine l'échelle du vote, dans le premier tableau du document
+        setRatingsList(data.data);
+        dispatch(loadRates(data.data));
+        console.log("fetch", data.data);
 
         let ratingMode;
         if (data && data.data && data.data[0]) {
-          // IMPORTANT on doit vérifier étape par étape la présence du tableau
-
-          // Pourquoi ne pas juste faire juste if (data.data[0]) ? Parce qu'essayer d'accéder à un tableau à partir de données qui n'existent peut-etre pas car ON ACCEDE PAS A UNE CLE D'UNDEFINED
-
-          // avec les conditions chainées, "data && data.data && data.data[0]", si dès le data c'est undefined, le code n'execute pas la condition et continue !
-
-          // si on trouve le premier tableau retourné par la route
-          ratingMode = data.data[0].ratingMode; // on cible la clé "ratingMode" pour s'assurer d'avoir les bonnes valeurs et les convertir en aval et on sauvegarde la valeur de la clé dans une constante
+          ratingMode = data.data[0].ratingMode;
         }
-
-        // pour que la valeur du vote soit correctement traitée, on doit définir son échelle
-        // soit s'assurer que le nom d'une clé corresponde à l'échelle associée
 
         if (ratingMode === "Out of 100") {
           setRatingScale(100);
         } else if (ratingMode === "Out of 10") {
-          // si le ratingMode du vote est sur 10, on modifie l'échelle
           setRatingScale(10);
         }
       });
+  };
+
+  useEffect(() => {
+    fetchRatings();
   }, []);
-  // }, [ratingsList]);
 
   let totalRatings = 0; // on initialise à 0 les deux paramètres nécessaires au calcul de la moyenne EN DEHORS de la boucle pour les exploiter
   let ratingsLength = 0;
@@ -127,12 +118,14 @@ function Game() {
                 );
               }
             })}
-            <span><b>Rating's date:</b>  {ratingDate}</span>
-          </div>
+            <span>
+              <b>Rating's date:</b> {ratingDate}
+            </span>
+          </div >
           <div className={styles.ratingDetails}>
             {/*La valeur de l'évaluation est convertie en emoji à l'aide d'une table de correspondance ratingToEmoji, et elle est affichée à l'aide du composant Image.*/}
             <span className={styles.ratingInfo}>
-              <b>Rating:{" "}</b>
+              <b>Rating: </b>
 
               {/* SI ACTIF BUG SUR L'AFFICHAGE AU CLIC SUR UNE GAME CARD DANS HOME */}
               <Image
@@ -146,17 +139,15 @@ function Game() {
                 height={24}
                 className={styles.iconMargin}
               />
-
             </span>
-            <span><b>Commentary:</b> {vote.comment}</span>
+            <span>
+              <b>Commentary:</b> {vote.comment}
+            </span>
           </div>
-        </div>
+        </div >
       );
     })
     : null;
-
-
-
 
   //WISHLIST HEART ICON CLICK
   //la fonction prend un seul paramètre : game. Cet objet représente le jeu sur lequel l'utilisateur a cliqué pour l'ajouter ou le retirer de la wishlist.
@@ -172,14 +163,6 @@ function Game() {
       console.log(`${game.name} added to wishlist`);
     }
   };
-
-
-  const handleHeartIconClick = (event, game) => {
-    event.stopPropagation();
-    // cela empêche l'événement de clic de "handleWishlistClick" de se propager à l'événement de clic "handleGameCardClick" de la div parente. Cela signifie que l'on peut cliquer sur le cœur et que cela ne déclenchera pas la navigation vers la page du jeu. Cela ajoutera simplement le jeu à la liste de souhaits.
-    handleWishlistClick(game);
-  };
-  // la constante ne s'execute que s'il y a au moins un vote => on divise le total des valeurs obtenueslors du map par le nombre de votes / sinon, la moyenne n'existe pas (0)
 
   const averageRating = ratingsLength > 0 ? totalRatings / ratingsLength : 0;
   const emojiAverage = ratingToEmoji[Math.round(averageRating)];
@@ -215,10 +198,13 @@ function Game() {
   return (
     <div className={isLightmode ? styles.containerLight : styles.container}>
       <div className={styles.middleContainer}>
-        <div
+        {gameDetails.imageGame && (<><div // la bannière ne s'affiche pas tant que les détails du jeu n'ont pas été
           className={styles.bannerContainer}
-          style={{ /* pour ne pas avoir d'erreur si l'image ne s'affiche pas assez rapidements */
-            backgroundImage: gameDetails.imageGame ? `url(${gameDetails.imageGame})` : "icons/emojiIcons/sad.svg", // on doit toujours spécifier le type de chemin avec l'attribut URL
+          style={{
+            /* pour ne pas avoir d'erreur si l'image ne s'affiche pas assez rapidements */
+            backgroundImage: gameDetails.imageGame
+              ? `url(${gameDetails.imageGame})`
+              : "icons/emojiIcons/sad.svg", // on doit toujours spécifier le type de chemin avec l'attribut URL
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
             backgroundSize: "cover",
@@ -226,15 +212,17 @@ function Game() {
           }}
         >
           <div className={styles.topBannerContainer}>
-            <button className={styles.iconButton} onHeartClick={(event) => handleHeartIconClick(event, gameDetails)}>
+            <button
+              className={wishlist.includes(gameDetails) ? styles.iconButtonPink : styles.iconButton}
+              onClick={() => handleWishlistClick(gameDetails)}
+            >
               {" "}
               <Image
-
                 src="/icons/heart.svg"
                 alt="Add to wishlist"
                 width={24}
                 height={24}
-              // className={styles.likeIcon}
+
               />
             </button>
             <button
@@ -253,51 +241,61 @@ function Game() {
             <p className={styles.textButton}>Rate it !</p>
           </div>
 
-
           {/* Permet d'éviter une erreur si l'image n'est pas récupérée au moment de l'execution */}
-          {gameDetails.imageGame && (<div className={styles.bottomBannerContainer}>
-            <h2 className={styles.sectionTitle}>{gameDetails.name}</h2>
-            <div className={styles.captionGameName}>
-              {emojiAverage ? (
-                <>
-                  {" "}
-                  <div className={styles.iconRating}>
-                    {/* Sûrement le plus difficle : sans conditionner le rendu au calcul de la moyenne, l'app crash ! Il faut laisser le temps au code de s'executer avant de tenter d'afficher l'image. C'est presque comme un await */}
+          {gameDetails.imageGame && (
+            <div className={styles.bottomBannerContainer}>
+              <h2 className={styles.sectionTitle}>{gameDetails.name}</h2>
+              <div className={styles.captionGameName}>
+                {emojiAverage ? (
+                  <>
+                    {" "}
+                    <div className={styles.iconRating}>
+                      {/* Sûrement le plus difficle : sans conditionner le rendu au calcul de la moyenne, l'app crash ! Il faut laisser le temps au code de s'executer avant de tenter d'afficher l'image. C'est presque comme un await */}
 
-                    <Image
-                      src={emojiAverage}
-                      alt="Rating icon"
-                      width={24}
-                      height={24}
-                    />
-
-                  </div>
-                  <p>
-                    Average rating -{" "}
-                    <span className={styles.caption}>
-                      BASED ON {ratingsLength} RATING{ratingsLength > 1 && "S"}
-                    </span>
-                  </p>
-                </>
-              ) : (
-                <>
-                  {" "}
-                  <p>No rating yet </p>
-                </>
-              )}
+                      <Image
+                        src={emojiAverage}
+                        alt="Rating icon"
+                        width={24}
+                        height={24}
+                      />
+                    </div>
+                    <p>
+                      Average rating -{" "}
+                      <span className={styles.caption}>
+                        BASED ON {ratingsLength} RATING
+                        {ratingsLength > 1 && "S"}
+                      </span>
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    {" "}
+                    <p>No rating yet </p>
+                  </>
+                )}
+              </div>
             </div>
-          </div>)}
-        </div>
+          )}
+        </div></>)}
         <div className={styles.bottomContainer}>
           <div className={styles.tagContainer}>
-
             {/* Si la clé du jeu n'est pas renseignée, on affiche pas le tag correspondant */}
-            {gameDetails.developer && (<div className={styles.tag01}>{gameDetails.developer}</div>)}
-            {gameDetails.platforms && (<div className={styles.tag02}>{gameDetails.platforms}</div>)}
-            {gameDetails.publisher && (<div className={styles.tag03}>{gameDetails.publisher}</div>)}
-            {gameDetails.releasedDate && (<div className={styles.tag04}>{gameDetails.releasedDate}</div>)}
-            {gameDetails.genre && (<div className={styles.tag05}>{gameDetails.genre}</div>)}
-          </div>
+            {gameDetails.developer && (
+              <div className={styles.tag01}>{gameDetails.developer}</div>
+            )}
+            {gameDetails.platforms && (
+              <div className={styles.tag02}>{gameDetails.platforms}</div>
+            )}
+            {gameDetails.publisher && (
+              <div className={styles.tag03}>{gameDetails.publisher}</div>
+            )}
+            {gameDetails.releasedDate && (
+              <div className={styles.tag04}>{gameDetails.releasedDate}</div>
+            )}
+            {gameDetails.genre && (
+              <div className={styles.tag05}>{gameDetails.genre}</div>
+            )}
+          </div >
 
           <div className={styles.descriptionContainer}>
             <h3>Summary</h3>
@@ -320,17 +318,17 @@ function Game() {
             <h3>Trailer</h3>
             <div className={styles.videoContainer}></div>
           </div> */}
-        </div>
-      </div>
+        </div >
+      </div >
       <Modal
         className={styles.frame}
         onCancel={() => handleCancelRateModal()}
         open={modalVisible}
         footer={null}
       >
-        <RateModal />
+        <RateModal onSubmit={fetchRatings} />
       </Modal>
-    </div>
+    </div >
   );
 }
 export default Game;

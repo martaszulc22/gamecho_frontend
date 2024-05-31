@@ -68,6 +68,7 @@ function RateModal({ onSubmit }) {
       ratingDate: new Date(), // date au moment de l'appel de la route
       //Pour le moment Date est le composant javascript de base, il faudra utiliser si on a le temps moment
       gameDetails: gameDetails, // reducer game qui contient TOUTES les données du jeu
+
     };
 
     dispatch(openCloseModal(false));
