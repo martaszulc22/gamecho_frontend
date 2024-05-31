@@ -40,7 +40,6 @@ function Game() {
       .then((data) => {
         console.log("useEffect data", data);
 
-
         setRatingsList(data.data);
         dispatch(loadRates(data.data));
         console.log("fetch", data.data);
@@ -133,12 +132,10 @@ function Game() {
                 // ICI on dynamise la source de l'icône utilisée pour illustrer le vote
                 // Il est nécessaire de se servir de l'échelle, enregistrée dans l'état, et de la diviser par 5 pour qu'elle puisse être associée à un chiffre de 1 à 5 et ce peu importe le ratingMode
                 // Le Math.floor est essentiel pour arrondir le resultat et obtenir un nombre entier et exploitable
-
                 src={emojiRate}
                 alt={`Rating: ${vote.rating}`}
                 width={24}
                 height={24}
-                className={styles.iconMargin}
               />
 
             </span>
@@ -241,7 +238,7 @@ function Game() {
 
 
           {/* Permet d'éviter une erreur si l'image n'est pas récupérée au moment de l'execution */}
-          {gameDetails.imageGame && (<div className={styles.bottomBannerContainer}>
+          {gameDetails.imageGame && (<div className={isLightmode ? styles.bottomBannerContainerLight : styles.bottomBannerContainer}>
             <h2 className={styles.sectionTitle}>{gameDetails.name}</h2>
             <div className={styles.captionGameName}>
               {emojiAverage ? (
@@ -255,6 +252,7 @@ function Game() {
                       alt="Rating icon"
                       width={24}
                       height={24}
+                      className={isLightmode ? styles.emojiLight : ''}
                     />
 
                   </div>
@@ -274,18 +272,18 @@ function Game() {
             </div>
           </div>)}
         </div>
-        <div className={styles.bottomContainer}>
+        <div className={isLightmode ? styles.bottomContainerLight : styles.bottomContainer}>
           <div className={styles.tagContainer}>
 
             {/* Si la clé du jeu n'est pas renseignée, on affiche pas le tag correspondant */}
-            {gameDetails.developer && (<div className={styles.tag01}>{gameDetails.developer}</div>)}
-            {gameDetails.platforms && (<div className={styles.tag02}>{gameDetails.platforms}</div>)}
-            {gameDetails.publisher && (<div className={styles.tag03}>{gameDetails.publisher}</div>)}
-            {gameDetails.releasedDate && (<div className={styles.tag04}>{gameDetails.releasedDate}</div>)}
-            {gameDetails.genre && (<div className={styles.tag05}>{gameDetails.genre}</div>)}
+            {gameDetails.developer && (<div className={styles.tag01} style={isLightmode ? { color: "#FFF9E8" } : ''}>{gameDetails.developer}</div>)}
+            {gameDetails.platforms && (<div className={styles.tag02} style={isLightmode ? { color: "#FFF9E8" } : ''}>{gameDetails.platforms}</div>)}
+            {gameDetails.publisher && (<div className={styles.tag03} style={isLightmode ? { color: "#FFF9E8" } : ''}>{gameDetails.publisher}</div>)}
+            {gameDetails.releasedDate && (<div className={styles.tag04} style={isLightmode ? { color: "#FFF9E8" } : ''}>{gameDetails.releasedDate}</div>)}
+            {gameDetails.genre && (<div className={styles.tag05} style={isLightmode ? { color: "#FFF9E8" } : ''}>{gameDetails.genre}</div>)}
           </div>
 
-          <div className={styles.descriptionContainer}>
+          <div className={isLightmode ? styles.descriptionContainerLight : styles.descriptionContainer}>
             <h3>Summary</h3>
             <div
               dangerouslySetInnerHTML={{ __html: gameDetails.description }}

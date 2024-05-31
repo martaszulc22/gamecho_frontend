@@ -6,7 +6,6 @@ import { openCloseModal } from "../reducers/config";
 import "moment/locale/fr";
 import { addRate } from "../reducers/rating";
 import { useRouter } from "next/router";
-import { fetchRatingsRef } from './Game';
 const moment = require("moment");
 moment.locale("fr");
 
