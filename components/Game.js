@@ -34,16 +34,15 @@ function Game() {
 
   const fetchRatings = () => {
     const query = `name=${gameDetails.name}`;
-    setTimeout(function () {
-      console.log('Third log message - after 10 second');
-    }, 1000);
+
     fetch(`http://localhost:3000/games/ratings?${query}`)
       .then((response) => response.json())
       .then((data) => {
         console.log("useEffect data", data);
 
-        dispatch(loadRates(data));
+
         setRatingsList(data.data);
+        dispatch(loadRates(data.data));
         console.log("fetch", data.data);
 
         let ratingMode;
@@ -61,7 +60,7 @@ function Game() {
 
   useEffect(() => {
     fetchRatings();
-  }, []);
+  }, [gameDetails.name]);
 
   let totalRatings = 0; // on initialise à 0 les deux paramètres nécessaires au calcul de la moyenne EN DEHORS de la boucle pour les exploiter
   let ratingsLength = 0;
@@ -150,9 +149,6 @@ function Game() {
     })
     : null;
 
-
-
-
   //WISHLIST HEART ICON CLICK
   //la fonction prend un seul paramètre : game. Cet objet représente le jeu sur lequel l'utilisateur a cliqué pour l'ajouter ou le retirer de la wishlist.
   const handleWishlistClick = (game) => {
@@ -168,12 +164,6 @@ function Game() {
     }
   };
 
-
-  const handleHeartIconClick = (event, game) => {
-    event.stopPropagation();
-    // cela empêche l'événement de clic de "handleWishlistClick" de se propager à l'événement de clic "handleGameCardClick" de la div parente. Cela signifie que l'on peut cliquer sur le cœur et que cela ne déclenchera pas la navigation vers la page du jeu. Cela ajoutera simplement le jeu à la liste de souhaits.
-    handleWishlistClick(game);
-  };
   // la constante ne s'execute que s'il y a au moins un vote => on divise le total des valeurs obtenueslors du map par le nombre de votes / sinon, la moyenne n'existe pas (0)
 
   const averageRating = ratingsLength > 0 ? totalRatings / ratingsLength : 0;
@@ -221,7 +211,8 @@ function Game() {
           }}
         >
           <div className={styles.topBannerContainer}>
-            <button className={styles.iconButton} onHeartClick={(event) => handleHeartIconClick(event, gameDetails)}>
+            <button className={styles.iconButton}
+              onHeartClick={() => handleWishlistClick(gameDetails)}>
               {" "}
               <Image
 

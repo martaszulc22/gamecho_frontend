@@ -10,6 +10,7 @@ import { fetchRatingsRef } from './Game';
 const moment = require("moment");
 moment.locale("fr");
 
+//{onSubmit} = props
 function RateModal({ onSubmit }) {
   const dispatch = useDispatch();
   const gameDetails = useSelector((state) => state.game.details);
@@ -69,8 +70,9 @@ function RateModal({ onSubmit }) {
       gameDetails: gameDetails, // reducer game qui contient TOUTES les données du jeu
     };
 
-    const response = dispatch(openCloseModal(false));
-    await fetch("http://localhost:3000/ratings/save", {
+    dispatch(openCloseModal(false));
+
+    const response = await fetch("http://localhost:3000/ratings/save", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -82,7 +84,7 @@ function RateModal({ onSubmit }) {
       console.log("Rating submitted successfully");
       //Rated
       dispatch(addRate(ratingData)); //Ajoute au tableau qui permettra d'afficher comme pour wishlist sur home, mais sur la page ratings
-      console.log(ratingData, "added to rating");
+      console.log(ratingData.gameName, "added to rating");
       setNewReview(""); // on vide la valeur de la review qui est dans input de la modal du rating via un setter
     } else {
       console.log("Error submitting rating");
