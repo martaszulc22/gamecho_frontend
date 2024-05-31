@@ -1,15 +1,15 @@
-import styles from '../styles/Rating.module.css';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
+import styles from "../styles/Rating.module.css";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from "react-redux";
 import { addRate, deleteRate } from "../reducers/rating";
-import Image from 'next/image';
+import Image from "next/image";
 import { useRouter } from "next/router";
 import { getGameDetails } from "../reducers/game";
 import GameCard from "../components/GameCard";
-import { loadRates } from '../reducers/rating';
+import { loadRates } from "../reducers/rating";
 
 const ratingToEmoji = {
     1: "/icons/emojiIcons/angry.svg",
@@ -19,12 +19,15 @@ const ratingToEmoji = {
     5: "/icons/emojiIcons/love.svg",
 };
 
-function Ratings() {
+//ratings
 
+// CONDITIONNER L AFFICHAGE
+
+function Ratings() {
     const router = useRouter();
     const dispatch = useDispatch();
     const wishlist = useSelector((state) => state.wishlist.value);
-    const isLightmode = useSelector((state) => state.config.value.mode);//Cible le mode dans le reducer setting
+    const isLightmode = useSelector((state) => state.config.value.mode); //Cible le mode dans le reducer setting
 
     //un état pour stocker les jeux de notre wishlist que nous voulons trouver
     const [arrayRating, setArrayRating] = useState([]);
@@ -37,10 +40,9 @@ function Ratings() {
     const user = useSelector((state) => state.user.value);
     console.log("USER ", user);
 
-    const gameDetails = useSelector((state) => state.game.details)
+    const gameDetails = useSelector((state) => state.game.details);
     // console.log("GAME DETAILS", gameDetails)
     // console.log("GAME NAME", gameDetails.name)
-
 
     // //Delete rating qui marche mais sans back
     // const deleteRating = (event, game) => {
@@ -53,24 +55,26 @@ function Ratings() {
             return;
         }
         fetch(`http://localhost:3000/ratings/${user.token}`)
-            .then(response => response.json())
-            .then(data => {
-                console.log("useEFFECT DATA", data)
+            .then((response) => response.json())
+            .then((data) => {
+                console.log("useEFFECT DATA", data);
                 data.result && dispatch(loadRates(data.user.ratings));
             });
     }, []);
 
-
-    const handleDelete = (rating, event) => {
+    const handleDelete = (event, rating) => { //inversion, les arguments doivent être dans l'ordre d'appel
+        event.stopPropagation();
         fetch(`http://localhost:3000/ratings/${user.token}/${rating.name}`, {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
         })
-            .then(response => response.json())
-            .then(data => {
-                //event.stopPropagation();
-                data.result && dispatch(deleteRate(rating));
-            })
+            .then((response) => response.json())
+            .then((data) => {
+                console.log("data de la supression", data)
+                console.log("rating supprimé", rating)
+
+                data.result && dispatch(deleteRate(rating.name));
+            });
     };
 
     const isAddedToWishlist = (game) => {
@@ -82,12 +86,11 @@ function Ratings() {
         router.push("game/");
     };
 
-
     let games = <p>No game is rated</p>;
-    if (ratings.length > 0) {
-        console.log("RATED GAMES", ratings)
+    if (ratings && ratings.length > 0) {
+        console.log("RATED GAMES", ratings);
         games = ratings.map((data, i) => {
-            console.log("RATED GAMES", games)
+            console.log("RATED GAMES", games);
             const ratingDate = new Date(data.ratingDate).toLocaleDateString();
             const ratingEmoji = ratingToEmoji[data.rating];
             return (
@@ -97,7 +100,7 @@ function Ratings() {
                             key={data.game.name}
                             game={data.game}
                             isAddedToWishlist={isAddedToWishlist(data.game)}
-                            onHeartClick={() => handleDelete(data.game)}
+                            onHeartClick={(event) => handleDelete(event, data.game)}
                             onClick={() => handleGameCardClick(data.game)}
                             iconType="trash"
                         />
@@ -113,9 +116,21 @@ function Ratings() {
                         <p className={styles.gameNameCard}>{game.gameDetails.name}</p>
                     </div> */}
                     <div className={styles.ratingInfo}>
-                        <span className={styles.infoWithIcon}><b>Rating:</b> <Image src={ratingEmoji} alt={`Rating: ${data.rating}`} width={24} height={24} /></span>
-                        <span className={styles.info}><b>Comment:</b> {data.comment}</span>
-                        <span className={styles.info}><b>Rating added on:</b> {ratingDate}</span>
+                        <span className={styles.infoWithIcon}>
+                            <b>Rating:</b>{" "}
+                            <Image
+                                src={ratingEmoji}
+                                alt={`Rating: ${data.rating}`}
+                                width={24}
+                                height={24}
+                            />
+                        </span>
+                        <span className={styles.info}>
+                            <b>Comment:</b> {data.comment}
+                        </span>
+                        <span className={styles.info}>
+                            <b>Rating added on:</b> {ratingDate}
+                        </span>
                     </div>
                 </div>
             );
@@ -125,15 +140,17 @@ function Ratings() {
     return (
         <div className={isLightmode ? styles.containerlight : styles.containerdark}>
             <Header />
-            <div className={styles.middleContainer}>
-                {/* l'input n'est pas affichée tant qu'il n'y a pas au moins 5 jeux ajoutés à la wishlist */}
-                <h2 className={styles.title}>My Ratings</h2>
-                <div className={styles.contentCard}>
-                    {games}
+            {ratings && (
+                <div className={styles.middleContainer}>
+                    {" "}
+                    {/* n'execute pas le code s'il n'y pas de rating */}
+                    {/* l'input n'est pas affichée tant qu'il n'y a pas au moins 5 jeux ajoutés à la wishlist */}
+                    <h2 className={styles.title}>My Ratings</h2>
+                    <div className={styles.contentCard}>{games}</div>
                 </div>
-            </div>
+            )}
             <Footer />
         </div>
-    )
+    );
 }
 export default Ratings;
