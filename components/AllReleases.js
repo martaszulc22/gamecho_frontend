@@ -33,7 +33,7 @@ function AllReleases() {
       }
       const data = await response.json();
       if (!data.latestgames) {
-        console.log("Invalid ddata latestgames", data);
+        console.log("Invalid data latestgames", data);
         return;
       }
       console.log("DATA LASTESTGAMES ", data.latestgames)

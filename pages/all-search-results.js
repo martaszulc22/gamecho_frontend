@@ -6,12 +6,12 @@ import Footer from '../components/Footer';
 function allSearchResultsPage() {
     return (
         <>
-        <Header />
+            <Header />
             <Head>
-                <title>All releases / Gamecho</title>
+                <title>All search results / Gamecho</title>
             </Head>
             <AllSearchResults />
-            <Footer/>
+            <Footer />
         </>
     );
 }
