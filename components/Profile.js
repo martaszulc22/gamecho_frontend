@@ -46,6 +46,7 @@ function Profile() {
         // création de la route
         method: "POST",
         body: formData,
+        mode: 'no-cors',
       })
         .then((response) => response.json())
         .then((data) => {
