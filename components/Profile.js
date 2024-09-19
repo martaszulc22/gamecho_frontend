@@ -42,7 +42,7 @@ function Profile() {
       const formData = new FormData(); // faceup part3 adapté à React
       formData.append("avatar", file); // premier paramètre = nom donné au fichier, second = cible du fichier
 
-      fetch("http://localhost:3000/profile/avatar", {
+      fetch("https://gamecho-backend.vercel.app/profile/avatar", {
         // création de la route
         method: "POST",
         body: formData,
@@ -70,7 +70,7 @@ function Profile() {
       return;
     }
 
-    fetch("http://localhost:3000/users/update-username", {
+    fetch("https://gamecho-backend.vercel.app/users/update-username", {
       method: "PUT",
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ currentUsername, newUsername })
@@ -102,7 +102,7 @@ function Profile() {
       return;
     }
 
-    fetch("http://localhost:3000/users/update-email", {
+    fetch("https://gamecho-backend.vercel.app/users/update-email", {
       method: "PUT",
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ currentEmail, newEmail })
@@ -120,7 +120,7 @@ function Profile() {
   };
 
   return (
-    <div className={isLightmode? styles.containerlight : styles.containerdark}>
+    <div className={isLightmode ? styles.containerlight : styles.containerdark}>
       {!user.token && (
         <div className={styles.middleContainer}>
           <div className={styles.centerText}>
@@ -131,13 +131,13 @@ function Profile() {
           <div className={styles.buttonContainer}>
             <div className={styles.signin}>
               <h3>Already have an account ?</h3>
-              <button className={isLightmode? styles.buttondark : styles.buttonlight} onClick={handleSignInClick}>
+              <button className={isLightmode ? styles.buttondark : styles.buttonlight} onClick={handleSignInClick}>
                 Sign In
               </button>
             </div>
             <div className={styles.signup}>
               <h3>New to GamEcho ? Create an account !</h3>
-              <button className={isLightmode? styles.buttondark : styles.buttonlight} onClick={handleSignUpClick}>
+              <button className={isLightmode ? styles.buttondark : styles.buttonlight} onClick={handleSignUpClick}>
                 Sign Up
               </button>
             </div>
@@ -154,7 +154,7 @@ function Profile() {
                 alt="Avatar"
                 width={150}
                 height={150}
-                className={isLightmode?styles.defaultAvatarLight:styles.defaultAvatar} />
+                className={isLightmode ? styles.defaultAvatarLight : styles.defaultAvatar} />
               <input
                 ref={fileInputRef}
                 type="file"
@@ -263,7 +263,7 @@ function Profile() {
             </div>
             {emailError && <div className={styles.errorContainer}><p className={styles.error}>{emailError}</p></div>}
           </div>
-          <button onClick={() => { router.push('/'); dispatch(logout()); }} className={isLightmode?styles.buttonlight:styles.buttondark}>Logout</button>
+          <button onClick={() => { router.push('/'); dispatch(logout()); }} className={isLightmode ? styles.buttonlight : styles.buttondark}>Logout</button>
         </div>
       )
       }

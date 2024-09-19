@@ -36,7 +36,7 @@ function Home() {
   useEffect(() => {
     const fetchLatestGames = async () => {
       const response = await fetch(
-        "http://localhost:3000/games/latestreleased", {
+        "https://gamecho-backend.vercel.app/games/latestreleased", {
         cache: "force-cache",
       }
       );
@@ -153,7 +153,7 @@ function Home() {
 
   const handleSearch = async () => {
     const response = await fetch(
-      `http://localhost:3000/games/search?name=${searchValue}`, {
+      `https://gamecho-backend.vercel.app/games/search?name=${searchValue}`, {
       cache: "force-cache",
     }
     );
@@ -172,7 +172,7 @@ function Home() {
   // Display only on the search icon
   const handleSearchSuggestions = async () => {
     const response = await fetch(
-      `http://localhost:3000/games/suggestions?name=${searchSuggValue}`, {
+      `https://gamecho-backend.vercel.app/games/suggestions?name=${searchSuggValue}`, {
       cache: "force-cache",
     }
     );
@@ -203,11 +203,11 @@ function Home() {
         <div className={styles.cropedBanner}>
           <div className={styles.bannerWelcomeMobile} alt="banner">
             <Image
-            src="/Banner_welcome_without_text.jpg"
-            alt="Banner Gamecho"
-            width={1920}
-            height={1000}
-            className={styles.bannerImageMobile}
+              src="/Banner_welcome_without_text.jpg"
+              alt="Banner Gamecho"
+              width={1920}
+              height={1000}
+              className={styles.bannerImageMobile}
             />
           </div>
         </div>
@@ -215,7 +215,7 @@ function Home() {
           <input
             type="text"
             className={styles.input}
-            onKeyDown={(e) => { 
+            onKeyDown={(e) => {
               if (e.key === "Enter") {
                 handleAllGames();
               }
@@ -229,17 +229,17 @@ function Home() {
           />
           <div className={styles.buttonSearch}>
 
-          <Image
-            onClick={() => handleAllGames()}
-            src="/icons/search.svg"
-            alt="Search"
-            width={24}
-            height={24}
-            className={
-              isLightmode ? styles.searchIconlight : styles.searchIcondark
-            }
+            <Image
+              onClick={() => handleAllGames()}
+              src="/icons/search.svg"
+              alt="Search"
+              width={24}
+              height={24}
+              className={
+                isLightmode ? styles.searchIconlight : styles.searchIcondark
+              }
             />
-            </div>
+          </div>
         </div>
         {/* <div className={styles.searchContainer}>
           <input

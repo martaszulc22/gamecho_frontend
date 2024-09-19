@@ -23,7 +23,7 @@ function AllSearchResults() {
 
         const fetchSearchResults = async () => {
             const response = await fetch(
-                `http://localhost:3000/games/search?name=${searchQuery}`, {
+                `https://gamecho-backend.vercel.app/games/search?name=${searchQuery}`, {
                 cache: "force-cache",
             });
 
