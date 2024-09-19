@@ -92,7 +92,7 @@ function RateModal({ onSubmit }) {
       // si erreur quelconque, message
     }
     console.log("Calling onSubmit");
-    onSubmit();
+    onSubmit(ratingData);
   };
 
   const handleSelection = (emojiPath, i) => {

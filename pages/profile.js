@@ -5,12 +5,12 @@ import Footer from '../components/Footer';
 function ProfilePage() {
     return (
         <>
-        <Header/>
+            <Header />
             <Head>
-                <title>Sign-up / GamEcho</title>
+                <title>Profile / GamEcho</title>
             </Head>
             <Profile />
-            <Footer/>
+            <Footer />
         </>
     );
 }

@@ -77,26 +77,6 @@ function Wishlist() {
       );
     });
   }
-  // const game = useDispatch()
-
-  // const [searchedGame, setSearchedGame] = useState('')
-
-
-  // const handleGame = () => {
-  //   fetch('')
-  // }
-
-  // const handleTrash = () => {
-  //   fetch('http://localhost:3000/wishlist', {
-  //     method: 'DELETE',
-  //     headers: { 'Content-Type': 'application/json' },
-  //     body: JSON.stringify({ game: game.name }),
-  //     //pas besoin de body?
-  //   }).then(response => response.json())
-  //     .then(data => {
-  //       data.result && dispatch(deleteGame(game.name));
-  //     });
-  // }
 
   return (
     <div className={isLightmode ? styles.containerlight : styles.containerdark}>
@@ -120,12 +100,12 @@ function Wishlist() {
             <div className={styles.buttonSearch}>
 
               <Image
-              onClick={handleSearchClick}
-              src="/icons/search.svg"
-              alt="Search"
-              width={24}
-              height={24}
-              className={isLightmode ? styles.searchIconlight : styles.searchIcondark}
+                onClick={handleSearchClick}
+                src="/icons/search.svg"
+                alt="Search"
+                width={24}
+                height={24}
+                className={isLightmode ? styles.searchIconlight : styles.searchIcondark}
               />
             </div>
           </div>
